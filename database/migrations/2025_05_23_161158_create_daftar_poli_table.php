@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('daftar_poli', function (Blueprint $table) {
+        Schema::create('daftar_polis', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_pasien')->constrained('users')->onDelete('cascade');
-            $table->foreignId('id_jadwal')->constrained('jadwal_periksa')->onDelete('cascade');
+            $table->foreignId('id_pasien')->constrained('pasiens')->onDelete('cascade');
+            $table->foreignId('id_jadwal')->constrained('jadwal_periksas')->onDelete('cascade');
             $table->text('keluhan')->nullable();
             $table->string('no_antrian')->unique();
             $table->timestamps();
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('daftar_poli');
+        Schema::dropIfExists('daftar_polis');
     }
 };

@@ -22,9 +22,6 @@ class User extends Authenticatable
         'id',
         'nama',
         'alamat',
-        'no_ktp',
-        'no_hp',
-        'no_rm',
     ];
 
     /**
@@ -48,10 +45,5 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
-    }
-
-    public function daftarPoli()
-    {
-        return $this->hasMany(Poli::class, 'id_user', 'id');
     }
 }
