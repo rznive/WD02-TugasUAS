@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('alamat');
             $table->string('no_hp');
             $table->foreignId('id_poli')->constrained('Polis')->onDelete('cascade');
-            $table->enum('role', ['dokter', 'admin'])->default('dokter');
             $table->timestamps();
         });
     }

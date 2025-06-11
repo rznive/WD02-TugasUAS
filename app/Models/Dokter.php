@@ -1,10 +1,8 @@
 <?php
 
 namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-
-class Dokter extends Model
+use Illuminate\Foundation\Auth\User as Authenticatable;
+class Dokter extends Authenticatable
 {
     protected $fillable = [
         'id',

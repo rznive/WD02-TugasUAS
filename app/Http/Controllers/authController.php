@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Dokter;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Pasien;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class authController extends Controller
@@ -50,24 +52,25 @@ class authController extends Controller
     }
 
     public function login(Request $request)
-    {
-        $request->validate([
-            'nama' => 'required|string|max:255',
-            'alamat' => 'required|string|max:255',
-        ]);
+{
+    $request->validate([
+        'nama' => 'required|string|max:255',
+        'alamat' => 'required|string|max:255',
+    ]);
 
-        $user = Pasien::where('nama', $request->nama)
-            ->where('alamat', $request->alamat)
-            ->first();
+    $pasien = Pasien::where('nama', $request->nama)
+        ->where('alamat', $request->alamat)
+        ->first();
 
-        if (!$user) {
-            toastr()->error('User tidak ditemukan, silahkan periksa kembali data yang anda masukkan');
-            return redirect()->back()->withInput();
-        }
-        Auth::login($user);
-        toastr()->success('Login berhasil, selamat datang ' . $user->nama);
+    if ($pasien) {
+        Auth::guard('pasien')->login($pasien);
+        toastr()->success('Login berhasil, selamat datang ' . $pasien->nama);
         return redirect()->route('dashboard.pasien');
     }
+
+    toastr()->error('User tidak ditemukan, silakan periksa kembali data yang Anda masukkan.');
+    return redirect()->back()->withInput();
+}
 
 
     public function registerDokter(Request $request)
@@ -88,5 +91,38 @@ class authController extends Controller
             'message' => 'Registrasi dokter berhasil',
             'user' => $user
         ], 201);
+    }
+
+    public function loginDokter(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'alamat' => 'required|string|max:255',
+        ]);
+
+
+        $admin = User::where('nama', $request->nama)
+            ->where('alamat', $request->alamat)
+            ->first();
+
+        if ($admin) {
+            Auth::guard('web')->login($admin);
+            toastr()->success('Autentikasi berhasil. Selamat datang, Admin ' . $admin->nama);
+            return redirect()->route('dashboard.admin');
+        }
+
+
+        $dokter = Dokter::where('nama', $request->nama)
+            ->where('alamat', $request->alamat)
+            ->first();
+
+        if ($dokter) {
+            Auth::guard('dokter')->login($dokter);
+            toastr()->success('Autentikasi berhasil. Selamat datang, Dokter ' . $dokter->nama);
+            return redirect()->route('dashboard.dokter');
+        }
+
+        toastr()->error('Data tidak ditemukan. Pastikan nama dan alamat Anda benar.');
+        return redirect()->back()->withInput();
     }
 }

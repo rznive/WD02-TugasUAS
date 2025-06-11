@@ -14,12 +14,35 @@
           </li>
            <li class="nav-item">
             <a href="/pages/dokter/jadwalPeriksa" class="nav-link">
-              <i class="nav-icon fas fa-hospital"></i>
-              <p>
-                Jadwal Periksa
-              </p>
+                <i class="nav-icon fas fa-hospital"></i>
+                <p>
+                    Jadwal Periksa
+                </p>
             </a>
-          </li>
+        </li>
+        <li class="nav-item">
+            <a href="/pages/dokter/pasien" class="nav-link">
+                <i class="nav-icon fas fa-user-injured"></i>
+                <p>
+                    Periksa Pasien
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/pages/dokter/riwayatPeriksa" class="nav-link">
+                <i class="nav-icon fas fa-history"></i>
+                <p>
+                    Riwayat Periksa
+                </p>
+            </a>
+        <li class="nav-item">
+            <a href="/pages/dokter/profile" class="nav-link">
+                <i class="nav-icon fas fa-user"></i>
+                <p>
+                    Edit Profile
+                </p>
+            </a>
+        </li>
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
