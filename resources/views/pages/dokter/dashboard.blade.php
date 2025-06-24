@@ -21,7 +21,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="/pages/dokter/pasien" class="nav-link">
+            <a href="/pages/dokter/periksaPasien" class="nav-link">
                 <i class="nav-icon fas fa-user-injured"></i>
                 <p>
                     Periksa Pasien

@@ -154,9 +154,16 @@
                                             <td>{{ $Dokter->Poli->nama_poli }}</< /td>
                                             <td>
                                                 <div class="d-flex justify-content-start gap-2">
-                                                    <button type="button" class="btn btn-sm btn-primary">
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-primary btn-edit-dokter"
+                                                        data-id="{{ $Dokter->id }}" data-nama="{{ $Dokter->nama }}"
+                                                        data-alamat="{{ $Dokter->alamat }}"
+                                                        data-no_hp="{{ $Dokter->no_hp }}"
+                                                        data-id_poli="{{ $Dokter->id_poli }}" data-toggle="modal"
+                                                        data-target="#editDokterModal">
                                                         <i class="fas fa-edit"></i> Edit
                                                     </button>
+
                                                     <form action="{{ route('deleteDokter.admin', $Dokter->id) }}"
                                                         method="POST"
                                                         onsubmit="return confirm('Yakin ingin hapus Dokter ini?')">
@@ -185,9 +192,71 @@
 </div>
 <!-- /.content-wrapper -->
 
+<div class="modal fade" id="editDokterModal" tabindex="-1" role="dialog" aria-labelledby="editDokterModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="editDokterForm" method="POST" action="{{ route('crudDokter.admin') }}">
+            @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDokterModalLabel">Edit Dokter</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="edit-id">
+                    <div class="form-group">
+                        <label for="edit-nama">Nama Dokter</label>
+                        <input type="text" class="form-control" id="edit-nama" name="nama" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-alamat">Alamat</label>
+                        <textarea class="form-control" id="edit-alamat" name="alamat" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-no_hp">No Hp</label>
+                        <input type="text" class="form-control" id="edit-no_hp" name="no_hp" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-id_poli">Pilih Poli</label>
+                        <select class="form-control" id="edit-id_poli" name="id_poli" required>
+                            @foreach ($listPoli as $poli)
+                                <option value="{{ $poli->id }}">{{ $poli->nama_poli }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 <!-- Control Sidebar -->
 <aside class="control-sidebar control-sidebar-dark">
     <!-- Control sidebar content goes here -->
 </aside>
 <!-- /.control-sidebar -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const editButtons = document.querySelectorAll('.btn-edit-dokter');
+
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                document.getElementById('edit-id').value = this.dataset.id;
+                document.getElementById('edit-nama').value = this.dataset.nama;
+                document.getElementById('edit-alamat').value = this.dataset.alamat;
+                document.getElementById('edit-no_hp').value = this.dataset.no_hp;
+                document.getElementById('edit-id_poli').value = this.dataset.id_poli;
+            });
+        });
+    });
+</script>
+
+
 @include('layouts.footer')

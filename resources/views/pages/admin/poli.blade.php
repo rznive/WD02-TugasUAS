@@ -133,9 +133,13 @@
                                             <td>{{ $Poli->keterangan }}</td>
                                             <td>
                                                 <div class="d-flex justify-content-start gap-2">
-                                                    <button type="button" class="btn btn-sm btn-primary">
+                                                    <button type="button" class="btn btn-sm btn-primary btn-edit-poli"
+                                                        data-id="{{ $Poli->id }}" data-nama="{{ $Poli->nama_poli }}"
+                                                        data-keterangan="{{ $Poli->keterangan }}" data-toggle="modal"
+                                                        data-target="#editPoliModal">
                                                         <i class="fas fa-edit"></i> Edit
                                                     </button>
+
                                                     <form action="{{ route('deletePoli.admin', $Poli->id) }}"
                                                         method="POST"
                                                         onsubmit="return confirm('Yakin ingin hapus Poli ini?')">
@@ -163,10 +167,55 @@
     <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
+<div class="modal fade" id="editPoliModal" tabindex="-1" role="dialog" aria-labelledby="editPoliModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="POST" action="/pages/admin/poli">
+            @csrf
+            <input type="hidden" name="id" id="edit-id">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Poli</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="edit-nama_poli">Nama Poli</label>
+                        <input type="text" class="form-control" id="edit-nama_poli" name="nama_poli" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-keterangan">Keterangan</label>
+                        <textarea class="form-control" id="edit-keterangan" name="keterangan" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 
 <!-- Control Sidebar -->
 <aside class="control-sidebar control-sidebar-dark">
     <!-- Control sidebar content goes here -->
 </aside>
 <!-- /.control-sidebar -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const editButtons = document.querySelectorAll('.btn-edit-poli');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                document.getElementById('edit-id').value = this.dataset.id;
+                document.getElementById('edit-nama_poli').value = this.dataset.nama;
+                document.getElementById('edit-keterangan').value = this.dataset.keterangan;
+            });
+        });
+    });
+</script>
+
 @include('layouts.footer')

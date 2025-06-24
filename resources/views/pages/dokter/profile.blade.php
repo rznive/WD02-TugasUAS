@@ -21,7 +21,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="/pages/dokter/pasien" class="nav-link">
+            <a href="/pages/dokter/periksaPasien" class="nav-link">
                 <i class="nav-icon fas fa-user-injured"></i>
                 <p>
                     Periksa Pasien
@@ -82,7 +82,7 @@
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form method="POST" action="/pages/admin/dokter">
+                        <form method="POST" action="/pages/dokter/profile">
                             @csrf
                             <div class="card-body">
                                 <div class="form-group">

@@ -62,27 +62,31 @@
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form>
+                        <form method="POST" action="/pages/pasien/poli">
+                            @csrf
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="exampleInputEmail1">No Rekam Medis</label>
-                                    <input type="email" class="form-control" id="exampleInputEmail1"
-                                        placeholder="Enter email">
+                                    <label for="no_rm">No Rekam Medis</label>
+                                    <input type="text" class="form-control" id="no_rm" name="no_rm"
+                                        value="{{ auth()->user()->no_rm }}" readonly>
                                 </div>
                                 <div class="form-group">
                                     <label for="poliSelect">Pilih Poli</label>
-                                    <select class="form-control" id="poliSelect">
-                                        <option value="umum">Poli Umum</option>
-                                        <option value="gigi">Poli Gigi</option>
+                                    <select class="form-control" id="poliSelect" name="id_poli">
+                                        @foreach ($poliList as $poli)
+                                            <option value="{{ $poli->id }}">{{ $poli->nama_poli }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="jadwalSelect">Pilih Jadwal</label>
-                                    <select class="form-control" id="jadwalSelect">
-                                        <option value="senin-08">Senin - 08:00</option>
-                                        <option value="selasa-10">Selasa - 10:00</option>
-                                        <option value="rabu-13">Rabu - 13:00</option>
+                                    <label for="jadwalSelect">Pilih Jadwal [under maintenancee bosq]</label>
+                                    <select class="form-control" id="jadwalSelect" name="id_jadwal">
+                                        <option value=""></option>
                                     </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="keluhan">Keluhan</label>
+                                    <textarea class="form-control" id="keluhan" name="keluhan" placeholder="Masukkan keluhan Anda"></textarea>
                                 </div>
                             </div>
                             <!-- /.card-body -->
@@ -120,17 +124,19 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>a</td>
-                                        <td>a</td>
-                                        <td>a</td>
-                                        <td>a</td>
-                                        <td>a</td>
-                                        <td>a</td>
-                                        <td>a</td>
-                                        <td>a</td>
-                                        <td>a</td>
-                                    </tr>
+                                    @foreach ($showDaftarPoli as $daftarPoli)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $daftarPoli->jadwalPeriksa?->dokter?->poli?->nama_poli ?? '-' }}</td>
+                                            <td>{{ $daftarPoli->jadwalPeriksa?->dokter?->nama ?? '-' }}</td>
+                                            <td>{{ $daftarPoli->jadwalPeriksa?->hari ?? '-' }}</td>
+                                            <td>{{ $daftarPoli->jadwalPeriksa?->jam_mulai ?? '-' }}</td>
+                                            <td>{{ $daftarPoli->jadwalPeriksa?->jam_selesai ?? '-' }}</td>
+                                            <td>{{ $daftarPoli->no_antrian }}</td>
+                                            <td>Soon</td>
+                                            <td>Soon</td>
+                                        </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -151,4 +157,35 @@
     <!-- Control sidebar content goes here -->
 </aside>
 <!-- /.control-sidebar -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#poliSelect').on('change', function() {
+            var poliId = $(this).val();
+
+            if (poliId) {
+                $.ajax({
+                    url: '/get-jadwal-by-poli/' + poliId,
+                    type: 'GET',
+                    success: function(data) {
+                        $('#jadwalSelect').empty().append(
+                            '');
+                        $.each(data, function(index, jadwal) {
+                            $('#jadwalSelect').append(
+                                '<option value="' + jadwal.id + '">' +
+                                jadwal.hari + ' - ' + jadwal.jam_mulai +
+                                '</option>'
+                            );
+                        });
+                    },
+                    error: function() {
+                        alert('Gagal mengambil data jadwal.');
+                    }
+                });
+            } else {
+                $('#jadwalSelect').html('');
+            }
+        });
+    });
+</script>
 @include('layouts.footer')

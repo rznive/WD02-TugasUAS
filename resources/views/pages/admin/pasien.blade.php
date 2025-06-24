@@ -149,9 +149,16 @@
                                             <td>{{ $Pasien->no_rm }}</td>
                                             <td>
                                                 <div class="d-flex justify-content-start gap-2">
-                                                    <button type="button" class="btn btn-sm btn-primary">
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-primary btn-edit-pasien"
+                                                        data-id="{{ $Pasien->id }}" data-nama="{{ $Pasien->nama }}"
+                                                        data-alamat="{{ $Pasien->alamat }}"
+                                                        data-no_ktp="{{ $Pasien->no_ktp }}"
+                                                        data-no_hp="{{ $Pasien->no_hp }}" data-toggle="modal"
+                                                        data-target="#editPasienModal">
                                                         <i class="fas fa-edit"></i> Edit
                                                     </button>
+
                                                     <form action="{{ route('deletePasien.admin', $Pasien->id) }}"
                                                         method="POST"
                                                         onsubmit="return confirm('Yakin ingin hapus Pasien ini?')">
@@ -180,9 +187,65 @@
 </div>
 <!-- /.content-wrapper -->
 
+<div class="modal fade" id="editPasienModal" tabindex="-1" role="dialog" aria-labelledby="editPasienModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="POST" action="/pages/admin/pasien">
+            @csrf
+            <input type="hidden" name="id" id="edit-id">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPasienModalLabel">Edit Pasien</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="edit-nama">Nama Pasien</label>
+                        <input type="text" class="form-control" id="edit-nama" name="nama" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-alamat">Alamat</label>
+                        <textarea class="form-control" id="edit-alamat" name="alamat" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-no_ktp">No KTP</label>
+                        <input type="number" class="form-control" id="edit-no_ktp" name="no_ktp" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-no_hp">No HP</label>
+                        <input type="number" class="form-control" id="edit-no_hp" name="no_hp" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 <!-- Control Sidebar -->
 <aside class="control-sidebar control-sidebar-dark">
     <!-- Control sidebar content goes here -->
 </aside>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const editButtons = document.querySelectorAll('.btn-edit-pasien');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                document.getElementById('edit-id').value = this.dataset.id;
+                document.getElementById('edit-nama').value = this.dataset.nama;
+                document.getElementById('edit-alamat').value = this.dataset.alamat;
+                document.getElementById('edit-no_ktp').value = this.dataset.no_ktp;
+                document.getElementById('edit-no_hp').value = this.dataset.no_hp;
+            });
+        });
+    });
+</script>
+
 <!-- /.control-sidebar -->
 @include('layouts.footer')

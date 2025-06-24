@@ -139,9 +139,14 @@
                                             <td>{{ $Obat->harga }}</td>
                                             <td>
                                                 <div class="d-flex justify-content-start gap-2">
-                                                    <button type="button" class="btn btn-sm btn-primary">
+                                                    <button type="button" class="btn btn-sm btn-primary btn-edit-obat"
+                                                        data-id="{{ $Obat->id }}" data-nama="{{ $Obat->nama_obat }}"
+                                                        data-kemasan="{{ $Obat->kemasan }}"
+                                                        data-harga="{{ $Obat->harga }}" data-toggle="modal"
+                                                        data-target="#editObatModal">
                                                         <i class="fas fa-edit"></i> Edit
                                                     </button>
+
                                                     <form action="{{ route('deleteObat.admin', $Obat->id) }}"
                                                         method="POST"
                                                         onsubmit="return confirm('Yakin ingin hapus Obat ini?')">
@@ -169,10 +174,60 @@
     <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
+<div class="modal fade" id="editObatModal" tabindex="-1" role="dialog" aria-labelledby="editObatModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="POST" action="/pages/admin/obat">
+            @csrf
+            <input type="hidden" name="id" id="edit-id">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Obat</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="edit-nama_obat">Nama Obat</label>
+                        <input type="text" class="form-control" id="edit-nama_obat" name="nama_obat" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-kemasan">Kemasan</label>
+                        <textarea class="form-control" id="edit-kemasan" name="kemasan" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-harga">Harga</label>
+                        <textarea class="form-control" id="edit-harga" name="harga" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 
 <!-- Control Sidebar -->
 <aside class="control-sidebar control-sidebar-dark">
     <!-- Control sidebar content goes here -->
 </aside>
 <!-- /.control-sidebar -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const editButtons = document.querySelectorAll('.btn-edit-obat');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                document.getElementById('edit-id').value = this.dataset.id;
+                document.getElementById('edit-nama_obat').value = this.dataset.nama;
+                document.getElementById('edit-kemasan').value = this.dataset.kemasan;
+                document.getElementById('edit-harga').value = this.dataset.harga;
+            });
+        });
+    });
+</script>
+
 @include('layouts.footer')
