@@ -24,4 +24,8 @@ class jadwalPeriksa extends Model
     {
         return $this->hasMany(DaftarPoli::class, 'id_jadwal', 'id');
     }
+    public function poli()
+{
+    return $this->belongsTo(Poli::class, 'id_poli', 'id');
+}
 }

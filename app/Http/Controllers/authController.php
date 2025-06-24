@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Pasien;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class authController extends Controller
 {
@@ -21,19 +22,25 @@ class authController extends Controller
         ]);
 
         if (Pasien::where('no_ktp', $request->no_ktp)->exists()) {
-            // return response()->json([
-            //     'message' => 'No KTP sudah terdaftar',
-            // ], 400);
             toastr()->error('No KTP sudah terdaftar');
             return redirect()->back()->withInput();
         }
 
         $year = date('Y');
         $month = date('m');
-        $count = Pasien::whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
-            ->count();
-        $no_rm = $year . $month . '-' . ($count + 1);
+        $prefix = $year . $month;
+
+        $lastPasien = Pasien::where('no_rm', 'like', "$prefix-%")
+            ->orderBy('no_rm', 'desc')
+            ->first();
+
+        if ($lastPasien) {
+            $lastNumber = (int) Str::after($lastPasien->no_rm, '-');
+        } else {
+            $lastNumber = 0;
+        }
+
+        $no_rm = $prefix . '-' . ($lastNumber + 1);
 
         $user = Pasien::create([
             'nama' => $request->nama,
@@ -42,35 +49,31 @@ class authController extends Controller
             'no_hp' => $request->no_hp,
             'no_rm' => $no_rm,
         ]);
-        // return response()->json([
-        //     'message' => 'Registrasi berhasil',
-        //     'user' => $user
-        // ], 201);
 
         toastr()->success('Registrasi berhasil, silahkan login untuk melanjutkan');
-        return redirect()->route('login');
+        return redirect()->route('loginPasien');
     }
 
     public function login(Request $request)
-{
-    $request->validate([
-        'nama' => 'required|string|max:255',
-        'alamat' => 'required|string|max:255',
-    ]);
+    {
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'alamat' => 'required|string|max:255',
+        ]);
 
-    $pasien = Pasien::where('nama', $request->nama)
-        ->where('alamat', $request->alamat)
-        ->first();
+        $pasien = Pasien::where('nama', $request->nama)
+            ->where('alamat', $request->alamat)
+            ->first();
 
-    if ($pasien) {
-        Auth::guard('pasien')->login($pasien);
-        toastr()->success('Login berhasil, selamat datang ' . $pasien->nama);
-        return redirect()->route('dashboard.pasien');
+        if ($pasien) {
+            Auth::guard('pasien')->login($pasien);
+            toastr()->success('Login berhasil, selamat datang ' . $pasien->nama);
+            return redirect()->route('dashboard.pasien');
+        }
+
+        toastr()->error('User tidak ditemukan, silakan periksa kembali data yang Anda masukkan.');
+        return redirect()->back()->withInput();
     }
-
-    toastr()->error('User tidak ditemukan, silakan periksa kembali data yang Anda masukkan.');
-    return redirect()->back()->withInput();
-}
 
 
     public function registerDokter(Request $request)

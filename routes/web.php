@@ -4,6 +4,8 @@ use App\Http\Controllers\adminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\authController;
 use App\Http\Controllers\dokterController;
+use App\Http\Controllers\pasienController;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return view('welcome');
@@ -23,15 +25,21 @@ Route::get('/pages/auth/login-dokter', function () {
     return view('pages.auth.loginDokter');
 })->name('loginDokter');
 Route::post('/pages/auth/login-dokter', [authController::class, 'loginDokter']);
+Route::post('/logout', function () {
+    Auth::guard('web')->logout();
+    Auth::guard('pasien')->logout();
+    Auth::guard('dokter')->logout();
+    return redirect('/pages/auth/login');
+})->name('logout');
 
 
 // Pasien
 Route::get('/pages/pasien', function () {
     return view('pages.pasien.dashboard');
 })->name('dashboard.pasien')->middleware('auth:pasien');
-Route::get('/pages/pasien/poli', function () {
-    return view('pages.pasien.poli');
-})->name('poli.pasien')->middleware('auth:pasien');
+Route::get('/pages/pasien/poli', [pasienController::class, 'Poli'])->name('poli.dokter')->middleware('auth:pasien');
+Route::post('/pages/pasien/poli', [pasienController::class, 'CRUDPoli'])->name('poli.pasien')->middleware('auth:pasien');
+Route::get('/get-jadwal-by-poli/{id_poli}', [PasienController::class, 'getJadwalByPoli']);
 
 
 // Dokter
@@ -40,9 +48,12 @@ Route::get('/pages/dokter', function () {
 })->name('dashboard.dokter')->middleware('auth:dokter');
 Route::get('/pages/dokter/jadwalPeriksa', [dokterController::class, 'jadwalPeriksa'])->name('jadwalPeriksa.dokter')->middleware('auth:dokter');
 Route::post('/pages/dokter/jadwalPeriksa', [dokterController::class, 'CRUDJadwal'])->name('jadwalPeriksa.dokter')->middleware('auth:dokter');
+Route::get('/pages/dokter/periksaPasien', [dokterController::class, 'periksaPasien'])->name('periksaPasien.dokter')->middleware('auth:dokter');
 Route::get('/pages/dokter/profile', function () {
     return view('pages.dokter.profile');
 })->name('profile.dokter')->middleware('auth:dokter');
+Route::post('/pages/dokter/profile', [dokterController::class, 'editProfile'])->name('editProfile.dokter')->middleware('auth:dokter');
+
 
 // Admin
 Route::get('/pages/admin', function () {

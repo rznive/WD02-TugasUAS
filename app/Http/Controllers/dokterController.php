@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\jadwalPeriksa;
 use Illuminate\Http\Request;
+use App\Models\DaftarPoli;
 
 class dokterController extends Controller
 {
@@ -12,6 +13,14 @@ class dokterController extends Controller
         $dokter = auth()->user();
         $jadwalPeriksa = $dokter->jadwalPeriksa()->latest()->get();
         return view('pages.dokter.jadwal', compact('jadwalPeriksa'));
+    }
+
+    public function periksaPasien()
+    {
+        $dokter = auth()->user();
+        $jadwalDokter = JadwalPeriksa::where('id_dokter', $dokter->id)->pluck('id');
+        $listPeriksa = DaftarPoli::whereIn('id_jadwal', $jadwalDokter)->with('pasien')->get();
+        return view('pages.dokter.periksa', compact('listPeriksa'));
     }
 
     public function CRUDJadwal(Request $request)

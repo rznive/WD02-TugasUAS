@@ -6,6 +6,7 @@ use App\Models\Obat;
 use App\Models\Dokter;
 use App\Models\Poli;
 use App\Models\Pasien;
+use Illuminate\Support\Str;
 
 class adminController extends Controller
 {
@@ -20,10 +21,20 @@ class adminController extends Controller
     {
         $year = date('Y');
         $month = date('m');
-        $count = Pasien::whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
-            ->count();
-        $no_rm = $year . $month . '-' . ($count + 1);
+        $prefix = $year . $month;
+
+        $lastPasien = Pasien::where('no_rm', 'like', "$prefix-%")
+            ->orderBy('no_rm', 'desc')
+            ->first();
+
+        if ($lastPasien) {
+            // Ambil nomor urutan terakhir dari no_rm, misalnya: 202506-3 → 3
+            $lastNumber = (int) Str::after($lastPasien->no_rm, '-');
+        } else {
+            $lastNumber = 0;
+        }
+
+        $no_rm = $prefix . '-' . ($lastNumber + 1);
 
         $data = request()->validate([
             'nama' => 'required|string|max:255',
@@ -107,7 +118,7 @@ class adminController extends Controller
             Poli::create($data);
         }
 
-       toastr()->success('Poli berhasil disimpan!');
+        toastr()->success('Poli berhasil disimpan!');
         return redirect()->route('poli.admin');
     }
 
@@ -115,7 +126,7 @@ class adminController extends Controller
     {
         $poli = Poli::findOrFail($id);
         $poli->delete();
-       toastr()->success('Poli berhasil dihapus!');
+        toastr()->success('Poli berhasil dihapus!');
         return redirect()->route('poli.admin');
     }
 

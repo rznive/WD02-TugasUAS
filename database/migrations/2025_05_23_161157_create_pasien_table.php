@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('nama');
             $table->string('alamat');   
             $table->string('no_ktp')->unique();
-            $table->string('no_hp')->unique();
+            $table->string('no_hp');
             $table->string('no_rm')->unique();
             $table->timestamps();
         });

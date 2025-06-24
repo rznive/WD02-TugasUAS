@@ -16,7 +16,9 @@ return new class extends Migration
             $table->foreignId('id_pasien')->constrained('pasiens')->onDelete('cascade');
             $table->foreignId('id_jadwal')->constrained('jadwal_periksas')->onDelete('cascade');
             $table->text('keluhan')->nullable();
-            $table->string('no_antrian')->unique();
+            $table->string('no_antrian');
+            // Unik per jadwal
+            $table->unique(['id_jadwal', 'no_antrian']);
             $table->timestamps();
         });
     }
