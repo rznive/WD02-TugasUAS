@@ -141,6 +141,10 @@
                                                                 <td>{{ $periksa->periksa->tgl_periksa }}</td>
                                                             </tr>
                                                             <tr>
+                                                                <th class="bg-light">Keluhan Pasien</th>
+                                                                <td>{{ $periksa->keluhan }}</td>
+                                                            </tr>
+                                                            <tr>
                                                                 <th class="bg-light">Catatan Dokter</th>
                                                                 <td>{{ $periksa->periksa->catatan }}</td>
                                                             </tr>

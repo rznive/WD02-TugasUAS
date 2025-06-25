@@ -99,12 +99,90 @@
                                             <td>{{ $periksa->pasien->nama }}</td>
                                             <td>{{ $periksa->keluhan }}</td>
                                             <td>
-                                                PERIKSA
+                                                <button class="btn btn-success btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#modalPeriksa{{ $periksa->id }}">
+                                                    PERIKSA
+                                                </button>
                                             </td>
+
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
+                            @foreach ($listPeriksa as $periksa)
+                                <div class="modal fade" id="modalPeriksa{{ $periksa->id }}" tabindex="-1"
+                                    aria-labelledby="modalPeriksaLabel{{ $periksa->id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <form action="{{ route('periksaPasien.dokter') }}" method="POST"
+                                                onsubmit="return confirm('Simpan data pemeriksaan?')">
+                                                @csrf
+                                                <input type="hidden" name="id_daftar_poli" value="{{ $periksa->id }}">
+                                                <div class="modal-header bg-success text-white">
+                                                    <h5 class="modal-title" id="modalPeriksaLabel{{ $periksa->id }}">
+                                                        Periksa Pasien – {{ $periksa->pasien->nama }}</h5>
+                                                    <button type="button" class="btn-close btn-close-white"
+                                                        data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label>Nama Pasien</label>
+                                                        <input type="text" class="form-control"
+                                                            value="{{ $periksa->pasien->nama }}" readonly>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label>Tanggal Periksa</label>
+                                                        <input type="text" class="form-control" name="tgl_periksa"
+                                                            value="{{ now()->format('Y-m-d') }}" readonly>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label>Catatan Dokter</label>
+                                                        <textarea name="catatan" class="form-control" rows="3" required></textarea>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label>Obat</label>
+                                                        <div class="row">
+                                                            @foreach ($listObat as $obat)
+                                                                <div class="col-md-6">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input obat-checkbox"
+                                                                            type="checkbox" name="obat[]"
+                                                                            value="{{ $obat->id }}"
+                                                                            data-harga="{{ $obat->harga }}"
+                                                                            id="obat{{ $periksa->id }}-{{ $obat->id }}">
+                                                                        <label class="form-check-label"
+                                                                            for="obat{{ $periksa->id }}-{{ $obat->id }}">
+                                                                            {{ $obat->nama_obat }} –
+                                                                            {{ $obat->kemasan }} <span
+                                                                                class="text-muted">(Rp
+                                                                                {{ number_format($obat->harga, 0, ',', '.') }})</span>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label>Total Biaya</label>
+                                                        <input type="text" class="form-control biaya-total"
+                                                            name="biaya_periksa" readonly value="150000">
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer bg-light">
+                                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Batal</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+
                         </div>
                     </div>
                     <!-- /.card -->
@@ -122,5 +200,28 @@
     <!-- Control sidebar content goes here -->
 </aside>
 <!-- /.control-sidebar -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll(".modal").forEach(function(modal) {
+            const checkboxes = modal.querySelectorAll(".obat-checkbox");
+            const biayaInput = modal.querySelector(".biaya-total");
+            const biayaDasar = 150000;
+
+            checkboxes.forEach(function(checkbox) {
+                checkbox.addEventListener("change", function() {
+                    let total = biayaDasar;
+                    checkboxes.forEach(cb => {
+                        if (cb.checked) {
+                            total += parseInt(cb.dataset.harga);
+                        }
+                    });
+                    biayaInput.value = total;
+                });
+            });
+        });
+    });
+</script>
 
 @include('layouts.footer')

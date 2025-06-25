@@ -15,7 +15,6 @@ class dokterController extends Controller
     {
         $dokter = auth()->user();
         $jadwalDokter = JadwalPeriksa::where('id_dokter', $dokter->id)->pluck('id');
-
         $listPeriksa = DaftarPoli::whereIn('id_jadwal', $jadwalDokter)
             ->with([
                 'pasien',
@@ -53,6 +52,7 @@ class dokterController extends Controller
             ->pluck('id');
 
         $listPeriksa = DaftarPoli::whereIn('id_jadwal', $jadwalHariIni)
+            ->whereDoesntHave('periksa')
             ->with('pasien')
             ->get();
 
@@ -65,36 +65,38 @@ class dokterController extends Controller
     public function CRUDPeriksa(Request $request)
     {
         $request->validate([
-            'id_periksa' => 'required|string',
+            'id_daftar_poli' => 'required|exists:daftar_polis,id',
             'tgl_periksa' => 'required|date',
             'catatan' => 'required|string',
             'biaya_periksa' => 'required|numeric',
-            'obat' => 'required|array',
+            'obat' => 'nullable|array',
+            'obat.*' => 'exists:obats,id',
         ]);
 
-        $periksa = Periksa::findOrFail($request->id_periksa);
-
-        if ($periksa->id_dokter !== auth()->id()) {
-            abort(403);
+        $existing = Periksa::where('id_daftar_poli', $request->id_daftar_poli)->first();
+        if ($existing) {
+            toastr()->error('Pasien ini sudah pernah diperiksa, tidak bisa mengedit!');
+            return redirect()->back();
         }
 
-        $periksa->update([
+        $periksa = Periksa::create([
+            'id_daftar_poli' => $request->id_daftar_poli,
             'tgl_periksa' => $request->tgl_periksa,
             'catatan' => $request->catatan,
             'biaya_periksa' => $request->biaya_periksa,
         ]);
 
-        $periksa->detailPeriksa()->delete();
-        foreach ($request->obat as $obat_id) {
+        foreach ($request->obat ?? [] as $obat_id) {
             detailPeriksa::create([
                 'id_periksa' => $periksa->id,
                 'id_obat' => $obat_id,
             ]);
         }
 
-        toastr()->success('Data Periksa Pasien berhasil diperbarui!');
+        toastr()->success('Data periksa pasien berhasil disimpan!');
         return redirect()->route('periksaPasien.dokter');
     }
+
 
 
     public function CRUDJadwal(Request $request)
