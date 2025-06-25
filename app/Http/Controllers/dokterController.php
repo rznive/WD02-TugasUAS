@@ -15,7 +15,14 @@ class dokterController extends Controller
     {
         $dokter = auth()->user();
         $jadwalDokter = JadwalPeriksa::where('id_dokter', $dokter->id)->pluck('id');
-        $listPeriksa = DaftarPoli::whereIn('id_jadwal', $jadwalDokter)->with('pasien')->get();
+
+        $listPeriksa = DaftarPoli::whereIn('id_jadwal', $jadwalDokter)
+            ->with([
+                'pasien',
+                'periksa.detailPeriksa.obat'
+            ])
+            ->get();
+
         return view('pages.dokter.riwayatPeriksa', compact('listPeriksa'));
     }
 
