@@ -5,9 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\jadwalPeriksa;
 use Illuminate\Http\Request;
 use App\Models\DaftarPoli;
+use App\Models\detailPeriksa;
+use App\Models\Obat;
+use App\Models\Periksa;
 
 class dokterController extends Controller
 {
+    public function riwayatPeriksa()
+    {
+        $dokter = auth()->user();
+        $jadwalDokter = JadwalPeriksa::where('id_dokter', $dokter->id)->pluck('id');
+        $listPeriksa = DaftarPoli::whereIn('id_jadwal', $jadwalDokter)->with('pasien')->get();
+        return view('pages.dokter.riwayatPeriksa', compact('listPeriksa'));
+    }
+
     public function jadwalPeriksa()
     {
         $dokter = auth()->user();
@@ -18,10 +29,66 @@ class dokterController extends Controller
     public function periksaPasien()
     {
         $dokter = auth()->user();
-        $jadwalDokter = JadwalPeriksa::where('id_dokter', $dokter->id)->pluck('id');
-        $listPeriksa = DaftarPoli::whereIn('id_jadwal', $jadwalDokter)->with('pasien')->get();
-        return view('pages.dokter.periksa', compact('listPeriksa'));
+        $hariMap = [
+            'Sunday'    => 'Minggu',
+            'Monday'    => 'Senin',
+            'Tuesday'   => 'Selasa',
+            'Wednesday' => 'Rabu',
+            'Thursday'  => 'Kamis',
+            'Friday'    => 'Jumat',
+            'Saturday'  => 'Sabtu',
+        ];
+
+        $hariIni = $hariMap[date('l')];
+
+        $jadwalHariIni = JadwalPeriksa::where('id_dokter', $dokter->id)
+            ->where('hari', $hariIni)
+            ->pluck('id');
+
+        $listPeriksa = DaftarPoli::whereIn('id_jadwal', $jadwalHariIni)
+            ->with('pasien')
+            ->get();
+
+        $listObat = Obat::all();
+
+        return view('pages.dokter.periksa', compact('listPeriksa', 'listObat'));
     }
+
+
+    public function CRUDPeriksa(Request $request)
+    {
+        $request->validate([
+            'id_periksa' => 'required|string',
+            'tgl_periksa' => 'required|date',
+            'catatan' => 'required|string',
+            'biaya_periksa' => 'required|numeric',
+            'obat' => 'required|array',
+        ]);
+
+        $periksa = Periksa::findOrFail($request->id_periksa);
+
+        if ($periksa->id_dokter !== auth()->id()) {
+            abort(403);
+        }
+
+        $periksa->update([
+            'tgl_periksa' => $request->tgl_periksa,
+            'catatan' => $request->catatan,
+            'biaya_periksa' => $request->biaya_periksa,
+        ]);
+
+        $periksa->detailPeriksa()->delete();
+        foreach ($request->obat as $obat_id) {
+            detailPeriksa::create([
+                'id_periksa' => $periksa->id,
+                'id_obat' => $obat_id,
+            ]);
+        }
+
+        toastr()->success('Data Periksa Pasien berhasil diperbarui!');
+        return redirect()->route('periksaPasien.dokter');
+    }
+
 
     public function CRUDJadwal(Request $request)
     {

@@ -54,7 +54,7 @@
         <div class="container-fluid">
             <div class="row">
                 <!-- left column -->
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
@@ -100,7 +100,7 @@
                 </div>
                 <!--/.col (left) -->
                 <!-- right column -->
-                <div class="col-md-6">
+                <div class="col-md-8">
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
@@ -115,26 +115,31 @@
                                         <th>#</th>
                                         <th>Poli</th>
                                         <th>Dokter</th>
-                                        <th>Hari</th>
-                                        <th>Mulai</th>
-                                        <th>Selesai</th>
+                                        <th>Jam</th>
                                         <th>Antrian</th>
                                         <th>Status</th>
-                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($showDaftarPoli as $daftarPoli)
                                         <tr>
-                                            <td>{{ $loop->iteration }}</td>
+                                            <td>
+                                                {{ $loop->iteration }}
+                                            </td>
                                             <td>{{ $daftarPoli->jadwalPeriksa?->dokter?->poli?->nama_poli ?? '-' }}</td>
                                             <td>{{ $daftarPoli->jadwalPeriksa?->dokter?->nama ?? '-' }}</td>
-                                            <td>{{ $daftarPoli->jadwalPeriksa?->hari ?? '-' }}</td>
-                                            <td>{{ $daftarPoli->jadwalPeriksa?->jam_mulai ?? '-' }}</td>
-                                            <td>{{ $daftarPoli->jadwalPeriksa?->jam_selesai ?? '-' }}</td>
+                                            <td>{{ $daftarPoli->jadwalPeriksa?->hari ?? '-' }},
+                                                {{ $daftarPoli->jadwalPeriksa?->jam_mulai ?? '-' }} -
+                                                {{ $daftarPoli->jadwalPeriksa?->jam_selesai ?? '-' }}</td>
                                             <td>{{ $daftarPoli->no_antrian }}</td>
-                                            <td>Soon</td>
-                                            <td>Soon</td>
+                                            <td class="text-center">
+                                                @if (is_null($daftarPoli->Periksa?->tgl_periksa))
+                                                    Belum Diperiksa
+                                                @else
+                                                    <span
+                                                        class="badge bg-info">Diperiksa {{ $daftarPoli->Periksa?->tgl_periksa }}</span>
+                                                @endif
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
